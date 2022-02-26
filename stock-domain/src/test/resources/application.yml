@@ -1,0 +1,54 @@
+---
+spring:
+    config:
+        activate:
+            on-profile: default
+    datasource:
+        stock:
+            username: root
+            password: pwd
+            jdbc-url: jdbc:mysql://localhost:53306/stock
+            driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        show-sql: true
+---
+spring:
+    config:
+        activate:
+            on-profile: test
+    datasource:
+        stock:
+            username: sa
+            password:
+            driver-class-name: org.h2.Driver
+            jdbc-url: jdbc:h2:mem:stock;DB_CLOSE_ON_EXIT=FALSE
+    jpa:
+        hibernate:
+            ddl-auto: create-drop
+        show-sql: true
+---
+spring:
+    config:
+        activate:
+            on-profile: local
+    datasource:
+        stock:
+            username: root
+            password: pwd
+            pool-name: Local-Stock-HikariPool
+            jdbc-url: jdbc:mysql://localhost:53306/stock
+            driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        show-sql: true
+---
+spring:
+    config:
+        activate:
+            on-profile: prod
+    datasource:
+        stock:
+            username: root
+            password: gkswkdgh
+            pool-name: Local-Stock-HikariPool
+            jdbc-url: jdbc:mysql://mysql.db.svc.cluster.local:3306/stock
+            driver-class-name: com.mysql.cj.jdbc.Driver
