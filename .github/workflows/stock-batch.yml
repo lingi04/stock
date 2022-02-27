@@ -5,18 +5,18 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Java CI with Gradle
+name: STOCK BATCH
 
 on:
     push:
         branches: [ master ]
     pull_request:
-        branches: [ develop, feature/setting-github-action ]
+        branches: [ develop, master ]
         paths:
             - stock-batch/**
 
 jobs:
-    test:
+    build:
         runs-on: ubuntu-latest
 
         steps:
@@ -29,4 +29,22 @@ jobs:
             -   name: Build with Gradle
                 uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
                 with:
-                    arguments: clean stock-batch:test
+                    arguments: clean stock-batch:build
+
+    deploy:
+        if: ${{ github.ref == 'refs/heads/master' }}
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Login to Amazon ECR
+                id: login-ecr
+                uses: aws-actions/amazon-ecr-login@v1
+
+            # Build Docker Image
+            -   name: Build Docker Image
+                run: |
+                    docker build --build-arg JAR_FILE=./stock-batch/build/libs/stock-batch-0.0.1-SNAPSHOT.jar -t stock/batch:latest .
+                    docker tag stock/batch:${{github.run_number}} 702867482623.dkr.ecr.ap-northeast-2.amazonaws.com/stock/batch:${{github.run_number}}
+            # Push Docker Image
+            -   name: Push Docker Image
+                run: |
+                    docker push 702867482623.dkr.ecr.ap-northeast-2.amazonaws.com/stock/batch:${{github.run_number}}
