@@ -9,7 +9,7 @@ name: STOCK BATCH
 
 on:
     push:
-        branches: [ master, feature/setting-github-action ]
+        branches: [ master ]
     pull_request:
         branches: [ develop, master ]
         paths:
@@ -36,7 +36,7 @@ jobs:
                     path: ./stock-batch/build/libs/stock-batch-0.0.1-SNAPSHOT.jar
 
     deploy:
-        #        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         needs: build
         runs-on: ubuntu-latest
         steps:
