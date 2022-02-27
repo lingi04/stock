@@ -35,7 +35,7 @@ jobs:
                 env:
                     cache-name: cache-source-code
                 with:
-                    path: /
+                    path: ./**
                     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
                     restore-keys: |
                         ${{ runner.os }}-build-${{ env.cache-name }}
