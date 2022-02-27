@@ -33,7 +33,7 @@ jobs:
             -   name: cache source code
                 uses: actions/cache@v2
                 env:
-                    cacne-name: cache-source-code
+                    cache-name: cache-source-code
                 with:
                     path: /
                     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_number }}
