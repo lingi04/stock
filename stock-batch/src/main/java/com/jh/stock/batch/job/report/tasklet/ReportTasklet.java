@@ -39,7 +39,7 @@ public class ReportTasklet implements Tasklet, StepExecutionListener {
     private final MyQuoteService myQuoteService;
 
     @Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         Iterable<Favorites> favoritesList = favoriteRepository.findAll();
         Set<String> tickerSet = StreamSupport.stream(favoritesList.spliterator(), false).flatMap(favorites -> favorites.getTickerList().stream()).collect(Collectors.toSet());
         List<MyStock> myStockList = stockRepository.findMyStockByTickerIn(tickerSet);
