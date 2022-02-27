@@ -9,7 +9,7 @@ name: STOCK BATCH
 
 on:
     push:
-        branches: [ master ]
+        branches: [ master, feature/setting-github-action ]
     pull_request:
         branches: [ develop, master ]
         paths:
@@ -32,7 +32,7 @@ jobs:
                     arguments: clean stock-batch:build
 
     deploy:
-        if: ${{ github.ref == 'refs/heads/master' }}
+        #        if: ${{ github.ref == 'refs/heads/master' }}
         needs: build
         runs-on: ubuntu-latest
         steps:
@@ -51,6 +51,8 @@ jobs:
             # Build Docker Image
             -   name: Build Docker Image
                 run: |
+                    cd ../
+                    tree
                     docker build --build-arg JAR_FILE=./stock-batch/build/libs/stock-batch-0.0.1-SNAPSHOT.jar -t stock/batch:${{github.run_number}} --file=./Dockerfile .
                     docker tag stock/batch:${{github.run_number}} 702867482623.dkr.ecr.ap-northeast-2.amazonaws.com/stock/batch:${{github.run_number}}
             # Push Docker Image
