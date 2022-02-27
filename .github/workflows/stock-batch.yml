@@ -30,11 +30,17 @@ jobs:
                 uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
                 with:
                     arguments: clean stock-batch:build
-            -   uses: actions/upload-artifact@v2
+            -   name: cache source code
+                uses: actions/cache@v2
+                env:
+                    cacne-name: cache-source-code
                 with:
-                    name: stock-batch-artifact
-                    path: ./stock-batch/build/libs/stock-batch-0.0.1-SNAPSHOT.jar
-
+                    path: /
+                    key: ${{ runner.os }}-build-${{ env.cache-name }}-${{github.run_number}
+                    restore-keys: |
+                        ${{ runner.os }}-build-${{ env.cache-name }}
+                        ${{ runner.os }}-build-
+                        ${{ runner.os }}-
     deploy:
         #        if: ${{ github.ref == 'refs/heads/master' }}
         needs: build
