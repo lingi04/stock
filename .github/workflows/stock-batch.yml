@@ -61,6 +61,8 @@ jobs:
             # Build Docker Image
             -   name: Build Docker Image
                 run: |
+                    cd ../../
+                    tree
                     docker build --build-arg JAR_FILE=./stock-batch/build/libs/stock-batch-0.0.1-SNAPSHOT.jar -t stock/batch:${{github.run_number}} .
                     docker tag stock/batch:${{github.run_number}} 702867482623.dkr.ecr.ap-northeast-2.amazonaws.com/stock/batch:${{github.run_number}}
             # Push Docker Image
