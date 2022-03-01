@@ -34,7 +34,7 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 @RequiredArgsConstructor
 public class ReportService {
-    public static final String METHODS = "xoxb-1629617946999-2345635836962-TpQA70YcjEUqDgC9wsBp82tN";
+    public static final String METHODS = "xoxb-1629617946999-2345635836962-bwTcJowWQKOsPnbgvSS3HFfE";
     private final IndicatorsService indicatorsService;
 
     public void sendReport(Favorites favorites, List<MyStock> myFavoriteStockList, Map<String, List<Indicators>> indicatorsMap, Map<String, MyQuote> quoteMap) {
