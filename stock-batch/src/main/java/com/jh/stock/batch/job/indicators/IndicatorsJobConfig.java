@@ -64,8 +64,8 @@ public class IndicatorsJobConfig {
             .name("jpaPagingItemReader")
             .entityManagerFactory(stockEntityManagerFactory)
             .pageSize(100)
-            .queryString("SELECT s FROM MyStock s where s.ticker = '005930'")
-//            .queryString("SELECT s FROM MyStock s")
+//            .queryString("SELECT s FROM MyStock s where s.ticker = '005930'")
+            .queryString("SELECT s FROM MyStock s")
             .build();
     }
 }
