@@ -58,3 +58,8 @@ spring:
             password: gkswkdgh
             driver-class-name: com.mysql.cj.jdbc.Driver
             jdbc-url: jdbc:mysql://mysql.db.svc.cluster.local:3306/batch
+        stock:
+            username: root
+            password: gkswkdgh
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            jdbc-url: jdbc:mysql://mysql.db.svc.cluster.local:3306/stock
