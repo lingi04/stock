@@ -34,7 +34,7 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 @RequiredArgsConstructor
 public class ReportService {
-    public static final String METHODS = "xoxb-1629617946999-2345635836962-bwTcJowWQKOsPnbgvSS3HFfE";
+    public static final String ACCESS_TOKEN = "xoxb-1629617946999-2345635836962-bK3hJZIXAU0qRFWndnFDXMwz";
     private final IndicatorsService indicatorsService;
 
     public void sendReport(Favorites favorites, List<MyStock> myFavoriteStockList, Map<String, List<Indicators>> indicatorsMap, Map<String, MyQuote> quoteMap) {
@@ -65,7 +65,7 @@ public class ReportService {
 
         Slack slack = Slack.getInstance();
         try {
-            slack.methods(METHODS)
+            slack.methods(ACCESS_TOKEN)
                 .chatPostMessage(req -> req.channel(channel).blocks(List.of(
                     headerBlock,
                     commonBLock,
