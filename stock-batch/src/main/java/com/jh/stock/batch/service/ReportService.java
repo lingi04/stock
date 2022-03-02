@@ -5,6 +5,7 @@ import com.jh.stock.domain.param.IndicatorsParam;
 import com.jh.stock.domain.param.SRimCreateParam;
 import com.jh.stock.domain.service.IndicatorsService;
 import com.slack.api.Slack;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.model.block.DividerBlock;
 import com.slack.api.model.block.HeaderBlock;
 import com.slack.api.model.block.LayoutBlock;
@@ -34,7 +35,7 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 @RequiredArgsConstructor
 public class ReportService {
-    public static final String ACCESS_TOKEN = "xoxb-1629617946999-2345635836962-bK3hJZIXAU0qRFWndnFDXMwz";
+    public static final String ACCESS_TOKEN = "xoxb-1629617946999-3166003651879-3TvrtduWcL18PZo4muauxcPG";
     private final IndicatorsService indicatorsService;
 
     public void sendReport(Favorites favorites, List<MyStock> myFavoriteStockList, Map<String, List<Indicators>> indicatorsMap, Map<String, MyQuote> quoteMap) {
@@ -65,7 +66,7 @@ public class ReportService {
 
         Slack slack = Slack.getInstance();
         try {
-            slack.methods(ACCESS_TOKEN)
+            ChatPostMessageResponse response = slack.methods(ACCESS_TOKEN)
                 .chatPostMessage(req -> req.channel(channel).blocks(List.of(
                     headerBlock,
                     commonBLock,
