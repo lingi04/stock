@@ -47,6 +47,10 @@ spring:
             driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
         show-sql: true
+
+slack:
+    token: ENC(U6Ej7PluvvslzvvJ7vaMnBdw/81WJ/rYvdLBl+rMfFTATCR5pNS9/0u8JG/Ep3vFTqa2U1c7IVwsteRmBNEZzzRJWXOg+Vur)
+
 ---
 spring:
     config:
@@ -63,3 +67,6 @@ spring:
             password: gkswkdgh
             driver-class-name: com.mysql.cj.jdbc.Driver
             jdbc-url: jdbc:mysql://mysql.db.svc.cluster.local:3306/stock
+
+slack:
+    token: ENC(U6Ej7PluvvslzvvJ7vaMnBdw/81WJ/rYvdLBl+rMfFTATCR5pNS9/0u8JG/Ep3vFTqa2U1c7IVwsteRmBNEZzzRJWXOg+Vur)

@@ -17,6 +17,7 @@ import com.sun.istack.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -35,7 +36,9 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 @RequiredArgsConstructor
 public class ReportService {
-    public static final String ACCESS_TOKEN = "xoxb-1629617946999-3166003651879-3TvrtduWcL18PZo4muauxcPG";
+    @Value("${slack.token}")
+    private String token;
+
     private final IndicatorsService indicatorsService;
 
     public void sendReport(Favorites favorites, List<MyStock> myFavoriteStockList, Map<String, List<Indicators>> indicatorsMap, Map<String, MyQuote> quoteMap) {
@@ -66,7 +69,7 @@ public class ReportService {
 
         Slack slack = Slack.getInstance();
         try {
-            ChatPostMessageResponse response = slack.methods(ACCESS_TOKEN)
+            ChatPostMessageResponse response = slack.methods(token)
                 .chatPostMessage(req -> req.channel(channel).blocks(List.of(
                     headerBlock,
                     commonBLock,
