@@ -15,6 +15,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,6 +32,8 @@ public class QuoteJobConfig {
     private final QuoteProcessor quoteProcessor;
     private final QuoteWriter quoteWriter;
     private final JobExecutionListener jobListener;
+
+    private final BeanFactory beanFactory;
 
     @Bean(name = QUOTE_JOB)
     public Job stockBatchJob() throws Exception {
@@ -55,10 +58,11 @@ public class QuoteJobConfig {
     @Bean
     @StepScope
     public JpaPagingItemReader<MyStock> jpaPagingItemReaderQuote() {
+        EntityManagerFactory stockEntityManagerFactory = (EntityManagerFactory) beanFactory.getBean("stockEntityManagerFactory");
 
         return new JpaPagingItemReaderBuilder<MyStock>()
             .name("jpaPagingItemReader")
-            .entityManagerFactory(entityManagerFactory)
+            .entityManagerFactory(stockEntityManagerFactory)
             .pageSize(100)
             .queryString("SELECT s FROM MyStock s")
             .build();
