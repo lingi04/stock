@@ -23,7 +23,7 @@ public class MyQuoteService {
 
     public Map<String, MyQuote> getLatestQuoteByTicker(Collection<String> tickerSet) {
         return myQuoteRepository.getLatestQuoteBy(tickerSet).stream()
-            .collect(Collectors.toMap(MyQuote::getTicker, Function.identity()));
+            .collect(Collectors.toMap(MyQuote::getTicker, Function.identity(), (q1, q2) -> q1));
 
     }
 }

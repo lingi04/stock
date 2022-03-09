@@ -123,6 +123,10 @@ public abstract class Indicators {
         return !isExpected();
     }
 
+    public String indicatorsDate() {
+        return this.businessYear + "." + this.businessMonth + "(" + indicatorType.name().charAt(0) + ")";
+    }
+
 //    public void update(IndicatorsParam indicatorsParam) {
 //        this.businessYear = Optional.ofNullable(indicatorsParam.getBusinessYear()).orElse(businessYear);
 //        this.businessMonth = Optional.ofNullable(indicatorsParam.getBusinessMonth()).orElse(this.businessMonth);

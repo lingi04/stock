@@ -173,4 +173,12 @@ public class IndicatorsService {
     public void deleteBy(String ticker, IndicatorType expected) {
         indicatorsRepository.deleteAllByTickerAndIndicatorType(ticker, expected);
     }
+
+    public List<Indicators> dateDesc(List<Indicators> indicatorsList) {
+        List<Indicators> tmpList = Optional.ofNullable(indicatorsList).orElse(Collections.emptyList());
+
+        return tmpList.stream()
+            .sorted(Comparator.comparingInt(Indicators::getBusinessYear).thenComparingInt((Indicators::getBusinessMonth)).reversed())
+            .collect(Collectors.toList());
+    }
 }
