@@ -24,7 +24,7 @@ public class MyStock {
     // 유동주식수 / 비율
     private Integer numberOfFloatingShares;
     //발행 주식 수
-    private Integer numberOfIssuedShares;
+    private Long numberOfIssuedShares;
     // 액면가
     private BigDecimal faceValue;
     // 베타
@@ -36,4 +36,8 @@ public class MyStock {
 
     @Transient
     private List<MyQuote> quoteList;
+
+    public void updateNumberOfIssuedShares(Long numberOfIssuedShares) {
+        this.numberOfIssuedShares = numberOfIssuedShares;
+    }
 }

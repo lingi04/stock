@@ -196,8 +196,7 @@ public abstract class Indicators {
                 && compareLong(this.shareOfControllingShareholder, indicators.getShareOfControllingShareholder())
                 && compareLong(this.shareOfNonControllingShareholder, indicators.getShareOfNonControllingShareholder())
                 && compareLong(this.capital, indicators.getCapital())
-                && compareLong(this.netMarginOfControllingShareholder, indicators.getNetMarginOfControllingShareholder())
-                && compareLong(this.numberOfIssuedShares, indicators.getNumberOfIssuedShares());
+                && compareLong(this.netMarginOfControllingShareholder, indicators.getNetMarginOfControllingShareholder());
         }
 
         return false;
