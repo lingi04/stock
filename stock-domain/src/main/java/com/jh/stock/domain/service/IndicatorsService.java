@@ -169,4 +169,8 @@ public class IndicatorsService {
     public int getLatestYear(List<Indicators> indicatorsList) {
         return indicatorsList.stream().map(Indicators::getBusinessYear).max(Integer::compareTo).orElse(0);
     }
+
+    public void deleteBy(String ticker, IndicatorType expected) {
+        indicatorsRepository.deleteAllByTickerAndIndicatorType(ticker, expected);
+    }
 }

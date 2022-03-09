@@ -14,4 +14,6 @@ public interface IndicatorsRepository extends CrudRepository<Indicators, Long> {
     List<Indicators> findAllByTickerAndBusinessYearInAndIndicatorType(String ticker, List<Integer> businessYearList, IndicatorType indicatorType);
 
     List<Indicators> findAllByTickerIn(Collection<String> tickerList);
+
+    void deleteAllByTickerAndIndicatorType(String ticker, IndicatorType indicatorType);
 }

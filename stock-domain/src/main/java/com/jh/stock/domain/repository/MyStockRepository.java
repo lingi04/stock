@@ -10,4 +10,6 @@ import java.util.Set;
 @Repository
 public interface MyStockRepository extends CrudRepository<MyStock, Integer> {
     List<MyStock> findMyStockByTickerIn(Set<String> tickerSet);
+
+    MyStock getMyStockByTicker(String ticker);
 }

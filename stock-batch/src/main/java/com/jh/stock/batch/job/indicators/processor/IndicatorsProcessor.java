@@ -1,11 +1,13 @@
 package com.jh.stock.batch.job.indicators.processor;
 
+import com.jh.stock.batch.TriFunction;
 import com.jh.stock.batch.dto.IndicatorsDto;
 import com.jh.stock.batch.service.CrawlingService;
 import com.jh.stock.batch.service.ParsingService;
 import com.jh.stock.domain.IndicatorType;
 import com.jh.stock.domain.Indicators;
 import com.jh.stock.domain.MyStock;
+import com.jh.stock.domain.repository.MyStockRepository;
 import com.jh.stock.domain.service.IndicatorsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,9 +26,32 @@ public class IndicatorsProcessor implements ItemProcessor<MyStock, List<Indicato
     private final CrawlingService crawlingService;
     private final IndicatorsService indicatorsService;
     private final ParsingService parsingService;
+    private final MyStockRepository myStockRepository;
 
     private String NAVER_FINANCIAL_URL = "https://finance.naver.com/item/main.nhn?code=%s";
     private String FN_GUIDE_URL = "http://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?gicode=A%s";
+
+    public final TriFunction<MyStock, List<IndicatorsDto>, Set<Indicators>, List<Indicators>> getNewConfirmedIndicatorList =
+        ((myStock, indicatorsDtoList, confirmedIndicators) -> indicatorsDtoList.stream()
+            .map(indicatorsDto -> {
+                Indicators indicators = indicatorsDto.toConfirmedIndicators();
+                indicators.initializeStocks(myStock);
+                return indicators;
+            })
+            .filter(indicators -> !confirmedIndicators.contains(indicators))
+            .collect(Collectors.toList())
+        );
+    public final TriFunction<MyStock, List<IndicatorsDto>, Set<Indicators>, List<Indicators>> getNewExpectedIndicatorList =
+        ((myStock, indicatorsDtoList, expectedIndicators) -> indicatorsDtoList.stream()
+            .map(indicatorsDto -> {
+                Indicators indicators = indicatorsDto.toExpectedIndicators();
+                indicators.initializeStocks(myStock);
+                return indicators;
+            })
+            .filter(indicators -> !expectedIndicators.contains(indicators))
+            .collect(Collectors.toList())
+        );
+
 
     @Override
     public List<Indicators> process(MyStock myStock) throws Exception {
@@ -61,31 +87,27 @@ public class IndicatorsProcessor implements ItemProcessor<MyStock, List<Indicato
         Set<Indicators> confirmedIndicators = new HashSet<>(indicatorsService.findAllByTickerAndBusinessYearInAndType(
             myStock.getTicker(), list, IndicatorType.CONFIRMED
         ));
-        indicatorsDtoMap.getOrDefault(IndicatorType.CONFIRMED, Collections.emptyList()).forEach(dto -> {
-            Indicators indicators = dto.toConfirmedIndicators();
-            log.debug("hashcode : {}", indicators.hashCode());
-            if (!confirmedIndicators.contains(indicators)) {
-                indicators.initializeStocks(myStock);
-                indicatorsList.add(indicators);
-            }
-        });
-
         // process expected indicators
-        List<Indicators> expectedIndicators = indicatorsService.findAllByTickerAndBusinessYearInAndType(
+        Set<Indicators> expectedIndicators = new HashSet(indicatorsService.findAllByTickerAndBusinessYearInAndType(
             myStock.getTicker(),
             indicatorsDtoMap.getOrDefault(IndicatorType.EXPECTED, Collections.emptyList()).stream().map(IndicatorsDto::getBusinessYear).collect(Collectors.toList()),
             IndicatorType.EXPECTED
-        );
-        indicatorsDtoMap.getOrDefault(IndicatorType.EXPECTED, Collections.emptyList()).forEach(dto -> {
-            Indicators indicators = dto.toExpectedIndicators();
-            if (!expectedIndicators.contains(indicators)) {
-                indicators.initializeStocks(myStock);
-                indicatorsList.add(indicators);
-            }
-        });
+        ));
+
+        List<Indicators> newConfirmedIndicators = getNewConfirmedIndicatorList.apply(myStock, indicatorsDtoMap.getOrDefault(IndicatorType.CONFIRMED, Collections.emptyList()), confirmedIndicators);
+        List<Indicators> newExpectedIndicators = getNewExpectedIndicatorList.apply(myStock, indicatorsDtoMap.getOrDefault(IndicatorType.EXPECTED, Collections.emptyList()), expectedIndicators);
+
+        indicatorsDtoMap.values().stream()
+            .flatMap(l -> l.stream())
+            .findAny()
+            .ifPresent(iDto -> {
+                myStock.updateNumberOfIssuedShares(iDto.getNumberOfIssuedShares());
+            });
+
+        myStockRepository.save(myStock);
 
         Thread.sleep(50);
 
-        return indicatorsList;
+        return Stream.concat(newConfirmedIndicators.stream(), newExpectedIndicators.stream()).collect(Collectors.toList());
     }
 }
