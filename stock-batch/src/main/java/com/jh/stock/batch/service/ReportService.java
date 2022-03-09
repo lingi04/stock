@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -47,24 +45,23 @@ public class ReportService {
                 myStock.getName(),
                 myStock.getTicker(),
                 favorites.getIndicatorReportList(),
-                indicatorsMap.getOrDefault(myStock.getTicker(), Collections.emptyList()).stream()
-                    .filter(Indicators::isConfirmed)
-                    .collect(groupingBy(Indicators::getIssuanceCycle)),
+                indicatorsMap.getOrDefault(myStock.getTicker(), Collections.emptyList()),
                 favorites.getSlackChannel(),
                 quoteMap.getOrDefault(myStock.getTicker(), MyQuote.emptyQuote())
             );
         });
     }
 
-    private void reportUsingSlack(String name, String ticker, List<IndicatorReportType> indicatorReportList, Map<IndicatorInterval, List<Indicators>> indicatorListMap, String channel, @NotNull MyQuote myQuote) {
+    private void reportUsingSlack(String name, String ticker, List<IndicatorReportType> indicatorReportList, List<Indicators> indicatorListMap, String channel, @NotNull MyQuote myQuote) {
         SimpleDateFormat s = new SimpleDateFormat("yy.MM.dd");
         String today = s.format(Timestamp.valueOf(LocalDateTime.now()));
         String title = name + "[" + ticker + "] - " + today;
         LayoutBlock headerBlock = HeaderBlock.builder().text(PlainTextObject.builder().text(title).build()).build();
 
+        indicatorsService.filterAndSortIndicatorList(indicatorListMap, IndicatorInterval.YEAR);
 
         TextObject quoteData = MarkdownTextObject.builder().text("*주가*\n" + addArrowEmoji(myQuote.getFluctuation()) + myQuote.toStringMarketPriceAndFluctuation()).build();
-        TextObject properPriceData = MarkdownTextObject.builder().text(getProperPrice(indicatorListMap.get(IndicatorInterval.YEAR))).build();
+        TextObject properPriceData = MarkdownTextObject.builder().text(getProperPrice(indicatorsService.filterAndSortIndicatorList(indicatorListMap, IndicatorInterval.YEAR))).build();
         LayoutBlock commonBLock = SectionBlock.builder().fields(List.of(quoteData, properPriceData)).build();
 
         Slack slack = Slack.getInstance();
@@ -73,8 +70,8 @@ public class ReportService {
                 .chatPostMessage(req -> req.channel(channel).blocks(List.of(
                     headerBlock,
                     commonBLock,
-                    getIndicatorsBlock(IndicatorInterval.YEAR, indicatorListMap, indicatorReportList),
-                    getIndicatorsBlock(IndicatorInterval.QUARTER, indicatorListMap, indicatorReportList),
+                    getIndicatorsBlock(IndicatorInterval.YEAR, indicatorsService.filterAndSortIndicatorList(indicatorListMap, IndicatorInterval.YEAR), indicatorReportList),
+                    getIndicatorsBlock(IndicatorInterval.QUARTER, indicatorsService.filterAndSortIndicatorList(indicatorListMap, IndicatorInterval.QUARTER), indicatorReportList),
                     DividerBlock.builder().build()))
                 );
         } catch (Exception e) {
@@ -124,15 +121,15 @@ public class ReportService {
         return sb.reverse().toString();
     }
 
-    private LayoutBlock getIndicatorsBlock(IndicatorInterval indicatorInterval, Map<IndicatorInterval, List<Indicators>> indicatorListMap, List<IndicatorReportType> indicatorReportList) {
+    private LayoutBlock getIndicatorsBlock(IndicatorInterval indicatorInterval, List<Indicators> indicatorListMap, List<IndicatorReportType> indicatorReportList) {
         TextObject indicatorsYearlyHeader = MarkdownTextObject.builder().text(
-            "*재무제표 - YEAR*\n"
+            "*재무제표 - " + indicatorInterval + "*\n"
         ).build();
         TextObject dateContext = MarkdownTextObject.builder().text(
-            indicatorsDateAsStr(indicatorListMap.getOrDefault(indicatorInterval, Collections.emptyList())) + "\n"
+            indicatorsDateAsStr(indicatorListMap) + "\n"
         ).build();
         TextObject content = MarkdownTextObject.builder().text(
-            indicatorsReportAsStr(indicatorListMap.getOrDefault(indicatorInterval, Collections.emptyList()), indicatorReportList)
+            indicatorsReportAsStr(indicatorListMap, indicatorReportList)
         ).build();
         return SectionBlock.builder().fields(
             List.of(
@@ -158,10 +155,13 @@ public class ReportService {
         if (indicatorsList.size() == 0) {
             return "-";
         }
-        Indicators i1 = indicatorsList.get(0);
+
+        List<Indicators> dateDescSortedList = indicatorsService.dateDesc(indicatorsList);
+
+        Indicators i1 = dateDescSortedList.get(0);
         Indicators i2;
-        if (indicatorsList.size() > 1) {
-            i2 = indicatorsList.get(1);
+        if (dateDescSortedList.size() > 1) {
+            i2 = dateDescSortedList.get(1);
         } else {
             i2 = ExpectedIndicators.from(IndicatorsParam.builder().build());
         }
@@ -174,18 +174,18 @@ public class ReportService {
             return "-";
         }
 
-        SimpleDateFormat s = new SimpleDateFormat("yy.MM.dd");
+        List<Indicators> dateDescSortedList = indicatorsService.dateDesc(indicatorsList);
 
-        Indicators i1 = indicatorsList.get(0);
-        String afterDate = s.format(i1.getCreateTime());
-        String startDate = null;
-        if (indicatorsList.size() > 1) {
-            startDate = s.format(indicatorsList.get(1).getCreateTime());
+        Indicators i1 = dateDescSortedList.get(0);
+        String beforeDate = i1.indicatorsDate();
+        String endDate = null;
+        if (dateDescSortedList.size() > 1) {
+            endDate = dateDescSortedList.get(1).indicatorsDate();
         }
-        if (startDate == null) {
-            return afterDate;
+        if (endDate == null) {
+            return beforeDate;
         } else {
-            return startDate + "-" + afterDate;
+            return endDate + "-" + beforeDate;
         }
     }
 }
