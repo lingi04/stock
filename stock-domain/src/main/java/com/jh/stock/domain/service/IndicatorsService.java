@@ -181,4 +181,8 @@ public class IndicatorsService {
             .sorted(Comparator.comparingInt(Indicators::getBusinessYear).thenComparingInt((Indicators::getBusinessMonth)).reversed())
             .collect(Collectors.toList());
     }
+
+    public Optional<Indicators> getExpectedLatestIndicators(List<Indicators> indicatorsList) {
+        return indicatorsList.stream().max(Comparator.comparing(Indicators::getBusinessYear).thenComparing(Indicators::getBusinessMonth));
+    }
 }

@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -52,16 +54,14 @@ public class ReportService {
         });
     }
 
-    private void reportUsingSlack(String name, String ticker, List<IndicatorReportType> indicatorReportList, List<Indicators> indicatorListMap, String channel, @NotNull MyQuote myQuote) {
+    private void reportUsingSlack(String name, String ticker, List<IndicatorReportType> indicatorReportList, List<Indicators> indicatorList, String channel, @NotNull MyQuote myQuote) {
         SimpleDateFormat s = new SimpleDateFormat("yy.MM.dd");
         String today = s.format(Timestamp.valueOf(LocalDateTime.now()));
         String title = name + "[" + ticker + "] - " + today;
         LayoutBlock headerBlock = HeaderBlock.builder().text(PlainTextObject.builder().text(title).build()).build();
 
-        indicatorsService.filterAndSortIndicatorList(indicatorListMap, IndicatorInterval.YEAR);
-
         TextObject quoteData = MarkdownTextObject.builder().text("*주가*\n" + addArrowEmoji(myQuote.getFluctuation()) + myQuote.toStringMarketPriceAndFluctuation()).build();
-        TextObject properPriceData = MarkdownTextObject.builder().text(getProperPrice(indicatorsService.filterAndSortIndicatorList(indicatorListMap, IndicatorInterval.YEAR))).build();
+        TextObject properPriceData = MarkdownTextObject.builder().text(getProperPrice(indicatorsService.filterAndSortIndicatorList(indicatorList, IndicatorInterval.YEAR))).build();
         LayoutBlock commonBLock = SectionBlock.builder().fields(List.of(quoteData, properPriceData)).build();
 
         Slack slack = Slack.getInstance();
@@ -70,8 +70,8 @@ public class ReportService {
                 .chatPostMessage(req -> req.channel(channel).blocks(List.of(
                     headerBlock,
                     commonBLock,
-                    getIndicatorsBlock(IndicatorInterval.YEAR, indicatorsService.filterAndSortIndicatorList(indicatorListMap, IndicatorInterval.YEAR), indicatorReportList),
-                    getIndicatorsBlock(IndicatorInterval.QUARTER, indicatorsService.filterAndSortIndicatorList(indicatorListMap, IndicatorInterval.QUARTER), indicatorReportList),
+                    getIndicatorsBlock(IndicatorInterval.YEAR, indicatorList, indicatorReportList),
+                    getIndicatorsBlock(IndicatorInterval.QUARTER, indicatorList, indicatorReportList),
                     DividerBlock.builder().build()))
                 );
         } catch (Exception e) {
@@ -121,15 +121,22 @@ public class ReportService {
         return sb.reverse().toString();
     }
 
-    private LayoutBlock getIndicatorsBlock(IndicatorInterval indicatorInterval, List<Indicators> indicatorListMap, List<IndicatorReportType> indicatorReportList) {
+    private LayoutBlock getIndicatorsBlock(IndicatorInterval indicatorInterval, List<Indicators> indicatorsList, List<IndicatorReportType> indicatorReportList) {
+
+        Map<IndicatorType, List<Indicators>> indicatorsListMapByIndicatorType = indicatorsList.stream()
+            .filter(indicators -> indicators.getIssuanceCycle() == indicatorInterval)
+            .collect(groupingBy(Indicators::getIndicatorType));
+
+        Optional<Indicators> expectedLatest = indicatorsService.getExpectedLatestIndicators(indicatorsListMapByIndicatorType.getOrDefault(IndicatorType.EXPECTED, Collections.emptyList()));
+
         TextObject indicatorsYearlyHeader = MarkdownTextObject.builder().text(
             "*재무제표 - " + indicatorInterval + "*\n"
         ).build();
         TextObject dateContext = MarkdownTextObject.builder().text(
-            indicatorsDateAsStr(indicatorListMap) + "\n"
+            indicatorsDateAsStr(indicatorsListMapByIndicatorType.getOrDefault(IndicatorType.CONFIRMED, Collections.emptyList()), expectedLatest) + "\n"
         ).build();
         TextObject content = MarkdownTextObject.builder().text(
-            indicatorsReportAsStr(indicatorListMap, indicatorReportList)
+            indicatorsReportAsStr(indicatorsListMapByIndicatorType.getOrDefault(IndicatorType.CONFIRMED, Collections.emptyList()), expectedLatest, indicatorReportList)
         ).build();
         return SectionBlock.builder().fields(
             List.of(
@@ -151,7 +158,7 @@ public class ReportService {
         return direction;
     }
 
-    private String indicatorsReportAsStr(@NonNull List<Indicators> indicatorsList, @NonNull List<IndicatorReportType> indicatorReportList) {
+    private String indicatorsReportAsStr(@NonNull List<Indicators> indicatorsList, Optional<Indicators> expectedIndicators, @NonNull List<IndicatorReportType> indicatorReportList) {
         if (indicatorsList.size() == 0) {
             return "-";
         }
@@ -166,26 +173,34 @@ public class ReportService {
             i2 = ExpectedIndicators.from(IndicatorsParam.builder().build());
         }
 
-        return indicatorReportList.stream().map(report -> report.getDescribe() + ": " + report.getContent(i1, i2)).collect(Collectors.joining("\n"));
+        return indicatorReportList.stream().map(report -> report.getDescribe() + ": " + report.getContent(i1, i2, expectedIndicators)).collect(Collectors.joining("\n"));
     }
 
-    private String indicatorsDateAsStr(@NonNull List<Indicators> indicatorsList) {
+    private String indicatorsDateAsStr(@NonNull List<Indicators> indicatorsList, Optional<Indicators> expectedIndicators) {
+        String rtnStr = "";
+
         if (indicatorsList.size() == 0) {
-            return "-";
+            rtnStr += "YY.mm-YY.mm";
         }
 
         List<Indicators> dateDescSortedList = indicatorsService.dateDesc(indicatorsList);
 
         Indicators i1 = dateDescSortedList.get(0);
-        String beforeDate = i1.indicatorsDate();
-        String endDate = null;
+        String afterDate = i1.indicatorsDate();
+        String beforeDate = null;
         if (dateDescSortedList.size() > 1) {
-            endDate = dateDescSortedList.get(1).indicatorsDate();
+            beforeDate = dateDescSortedList.get(1).indicatorsDate();
         }
-        if (endDate == null) {
-            return beforeDate;
+        if (beforeDate == null) {
+            rtnStr += afterDate;
         } else {
-            return endDate + "-" + beforeDate;
+            rtnStr += beforeDate + "-" + afterDate;
         }
+
+        if (expectedIndicators.isPresent()) {
+            rtnStr += "-" + expectedIndicators.get().indicatorsDate();
+        }
+
+        return rtnStr;
     }
 }

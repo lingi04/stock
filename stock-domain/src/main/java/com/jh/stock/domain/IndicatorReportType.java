@@ -1,5 +1,7 @@
 package com.jh.stock.domain;
 
+import com.jh.stock.domain.common.TriFunction;
+
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -12,7 +14,13 @@ public enum IndicatorReportType {
 
             return afterRoe.compareTo(beforeRoe);
         },
-        (Indicators after, Indicators before) -> before.getRoe() + "-> " + after.getRoe()
+        (Indicators after, Indicators before, Optional<Indicators> expected) -> {
+            String rtnStr = before.getRoe() + "-> " + after.getRoe();
+            if (expected.isPresent()) {
+                rtnStr += " -> " + expected.get().getRoe();
+            }
+            return rtnStr;
+        }
     ),
     TOTAL_REVENUE("매출액",
         (Indicators after, Indicators before) -> {
@@ -21,7 +29,13 @@ public enum IndicatorReportType {
 
             return a.compareTo(b);
         },
-        (Indicators after, Indicators before) -> before.getTotalRevenue() + " -> " + after.getTotalRevenue()
+        (Indicators after, Indicators before, Optional<Indicators> expected) -> {
+            String rtnStr = before.getTotalRevenue() + " -> " + after.getTotalRevenue();
+            if (expected.isPresent()) {
+                rtnStr += " -> " + expected.get().getTotalRevenue();
+            }
+            return rtnStr;
+        }
     ),
     TOTAL_EQUITY("자본 총계",
         (Indicators after, Indicators before) -> {
@@ -30,7 +44,13 @@ public enum IndicatorReportType {
 
             return a.compareTo(b);
         },
-        (Indicators after, Indicators before) -> before.getTotalEquity() + " -> " + after.getTotalEquity()
+        (Indicators after, Indicators before, Optional<Indicators> expected) -> {
+            String rtnStr = before.getTotalEquity() + " -> " + after.getTotalEquity();
+            if (expected.isPresent()) {
+                rtnStr += " -> " + expected.get().getTotalEquity();
+            }
+            return rtnStr;
+        }
     ),
     OPERATING_PROFIT("영업이익",
         (Indicators after, Indicators before) -> {
@@ -39,7 +59,13 @@ public enum IndicatorReportType {
 
             return a.compareTo(b);
         },
-        (Indicators after, Indicators before) -> before.getOperatingProfit() + " -> " + after.getOperatingProfit()
+        (Indicators after, Indicators before, Optional<Indicators> expected) -> {
+            String rtnStr = before.getOperatingProfit() + " -> " + after.getOperatingProfit();
+            if (expected.isPresent()) {
+                rtnStr += " -> " + expected.get().getOperatingProfit();
+            }
+            return rtnStr;
+        }
     ),
     TOTAL_LIABILITIES("부채 총계",
         (Indicators after, Indicators before) -> {
@@ -48,15 +74,21 @@ public enum IndicatorReportType {
 
             return a.compareTo(b);
         },
-        (Indicators after, Indicators before) -> before.getTotalLiabilities() + " -> " + after.getTotalLiabilities()
+        (Indicators after, Indicators before, Optional<Indicators> expected) -> {
+            String rtnStr = before.getTotalLiabilities() + " -> " + after.getTotalLiabilities();
+            if (expected.isPresent()) {
+                rtnStr += " -> " + expected.get().getTotalLiabilities();
+            }
+            return rtnStr;
+        }
     );
 
     String describe;
     BiFunction<Indicators, Indicators, Integer> comparator;
-    BiFunction<Indicators, Indicators, String> reportContent;
+    TriFunction<Indicators, Indicators, Optional<Indicators>, String> reportContent;
 
-    public String getContent(Indicators after, Indicators before) {
-        return reportContent.apply(after, before);
+    public String getContent(Indicators after, Indicators before, Optional<Indicators> expected) {
+        return reportContent.apply(after, before, expected);
     }
 
     public String getDescribe() {
@@ -65,7 +97,7 @@ public enum IndicatorReportType {
 
     IndicatorReportType(String describe,
                         BiFunction<Indicators, Indicators, Integer> comparator,
-                        BiFunction<Indicators, Indicators, String> reportContent) {
+                        TriFunction<Indicators, Indicators, Optional<Indicators>, String> reportContent) {
         this.describe = describe;
         this.comparator = comparator;
         this.reportContent = reportContent;
