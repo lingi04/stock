@@ -3,6 +3,7 @@ package com.jh.stock.domain;
 import com.jh.stock.domain.common.TriFunction;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -86,6 +87,8 @@ public enum IndicatorReportType {
     String describe;
     BiFunction<Indicators, Indicators, Integer> comparator;
     TriFunction<Indicators, Indicators, Optional<Indicators>, String> reportContent;
+    private static DecimalFormat FORMATTING_NUMBER = new DecimalFormat("#,###");
+    private static DecimalFormat FORMATTING_FLOATING_POINT = new DecimalFormat("#,###.00");
 
     public String getContent(Indicators after, Indicators before, Optional<Indicators> expected) {
         return reportContent.apply(after, before, expected);
@@ -101,5 +104,13 @@ public enum IndicatorReportType {
         this.describe = describe;
         this.comparator = comparator;
         this.reportContent = reportContent;
+    }
+
+    public static String formatNumber(long l) {
+        return FORMATTING_NUMBER.format(l);
+    }
+
+    public static String formatNumber(Object o) {
+        return FORMATTING_FLOATING_POINT.format(o);
     }
 }
