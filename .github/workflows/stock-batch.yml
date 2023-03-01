@@ -71,5 +71,5 @@ jobs:
                     curl -X POST https://api.github.com/repos/lingi04/kube-argo/dispatches \
                     -H 'Accept: application/vnd.github+json' \
                     -H "Authorization: Bearer ${{secrets.PERSONAL_ACCESS_KEY}}" \
-                    -d '{"event_type": "stock-batch", "client_payload": { "repository": "${{$GITHUB_REPOSITORY}}", "runNumber":"${{github.run_number}}" }}'
+                    -d '{"event_type": "stock-batch", "client_payload": { "repository": "${{GITHUB_REPOSITORY}}", "runNumber":"${{github.run_number}}" }}'
             
