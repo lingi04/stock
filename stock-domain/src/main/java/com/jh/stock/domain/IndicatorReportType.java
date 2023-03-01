@@ -16,9 +16,9 @@ public enum IndicatorReportType {
             return afterRoe.compareTo(beforeRoe);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = before.getRoe() + "-> " + after.getRoe();
+            String rtnStr = formatNumber(before.getRoe()) + "-> " + formatNumber(after.getRoe());
             if (expected.isPresent()) {
-                rtnStr += " -> " + expected.get().getRoe();
+                rtnStr += " -> " + formatNumber(expected.get().getRoe());
             }
             return rtnStr;
         }
@@ -31,9 +31,9 @@ public enum IndicatorReportType {
             return a.compareTo(b);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = before.getTotalRevenue() + " -> " + after.getTotalRevenue();
+            String rtnStr = formatNumber(before.getTotalRevenue()) + " -> " + formatNumber(after.getTotalRevenue());
             if (expected.isPresent()) {
-                rtnStr += " -> " + expected.get().getTotalRevenue();
+                rtnStr += " -> " + formatNumber(expected.get().getTotalRevenue());
             }
             return rtnStr;
         }
@@ -46,9 +46,9 @@ public enum IndicatorReportType {
             return a.compareTo(b);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = before.getTotalEquity() + " -> " + after.getTotalEquity();
+            String rtnStr = formatNumber(before.getTotalEquity()) + " -> " + formatNumber(after.getTotalEquity());
             if (expected.isPresent()) {
-                rtnStr += " -> " + expected.get().getTotalEquity();
+                rtnStr += " -> " + formatNumber(expected.get().getTotalEquity());
             }
             return rtnStr;
         }
@@ -61,9 +61,9 @@ public enum IndicatorReportType {
             return a.compareTo(b);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = before.getOperatingProfit() + " -> " + after.getOperatingProfit();
+            String rtnStr = formatNumber(before.getOperatingProfit() + " -> " + formatNumber(after.getOperatingProfit());
             if (expected.isPresent()) {
-                rtnStr += " -> " + expected.get().getOperatingProfit();
+                rtnStr += " -> " + formatNumber(expected.get().getOperatingProfit());
             }
             return rtnStr;
         }
@@ -76,9 +76,9 @@ public enum IndicatorReportType {
             return a.compareTo(b);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = before.getTotalLiabilities() + " -> " + after.getTotalLiabilities();
+            String rtnStr = formatNumber(before.getTotalLiabilities()) + " -> " + formatNumber(after.getTotalLiabilities());
             if (expected.isPresent()) {
-                rtnStr += " -> " + expected.get().getTotalLiabilities();
+                rtnStr += " -> " + formatNumber(expected.get().getTotalLiabilities());
             }
             return rtnStr;
         }
