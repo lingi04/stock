@@ -1,8 +1,10 @@
 name: trigger-test
+
+on:
   push:
     branches: [ develop ]
-  pull_requestdevelop
-    branches: [ master ]
+  pull_request:
+    branches: [ develop ]
 
 jobs:
   build:
