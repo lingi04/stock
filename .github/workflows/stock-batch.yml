@@ -65,3 +65,11 @@ jobs:
             -   name: Push Docker Image
                 run: |
                     docker push 702867482623.dkr.ecr.ap-northeast-2.amazonaws.com/stock/batch:${{github.run_number}}
+            # Trigger kube-argo github action
+            -   name: Trigger kube-argo
+                run: |
+                    curl -X POST https://api.github.com/repos/lingi04/kube-argo/dispatches \
+                    -H 'Accept: application/vnd.github+json' \
+                    -H "Authorization: Bearer ${{secrets.PERSONAL_ACCESS_KEY}}" \
+                    -d '{"event_type": "stock-batch", "client_payload": { "repository": "${{$GITHUB_REPOSITORY}}", "runNumber":"${{github.run_number}}" }}'
+            
