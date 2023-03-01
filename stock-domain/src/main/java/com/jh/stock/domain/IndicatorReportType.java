@@ -61,7 +61,7 @@ public enum IndicatorReportType {
             return a.compareTo(b);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = formatNumber(before.getOperatingProfit() + " -> " + formatNumber(after.getOperatingProfit());
+            String rtnStr = formatNumber(before.getOperatingProfit() + " -> " + formatNumber(after.getOperatingProfit()));
             if (expected.isPresent()) {
                 rtnStr += " -> " + formatNumber(expected.get().getOperatingProfit());
             }
@@ -84,9 +84,9 @@ public enum IndicatorReportType {
         }
     );
 
-    String describe;
-    BiFunction<Indicators, Indicators, Integer> comparator;
-    TriFunction<Indicators, Indicators, Optional<Indicators>, String> reportContent;
+    private String describe;
+    private BiFunction<Indicators, Indicators, Integer> comparator;
+    private TriFunction<Indicators, Indicators, Optional<Indicators>, String> reportContent;
     private static DecimalFormat FORMATTING_NUMBER = new DecimalFormat("#,###");
     private static DecimalFormat FORMATTING_FLOATING_POINT = new DecimalFormat("#,###.00");
 

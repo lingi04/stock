@@ -9,7 +9,6 @@ name: STOCK DOMAIN
 
 on:
     pull_request:
-        branches: [ develop ]
         paths:
             - stock-domain/**
 
