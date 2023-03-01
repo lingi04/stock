@@ -15,6 +15,6 @@ jobs:
       - name: Send Trigger
         run: |
           curl -X POST https://api.github.com/repos/lingi04/kube-argo/dispatches \
-          -H 'Accept: application/vnd.github.v3+json' \
-          -u ${{ secrets.ACCESS_TOKEN }} \
+          -H 'Accept: application/vnd.github+json' \
+          -H "Authorization: Bearer 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"
           -d '{"event_type": "stock-batch", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
