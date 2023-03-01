@@ -61,7 +61,7 @@ public enum IndicatorReportType {
             return a.compareTo(b);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = formatNumber(before.getOperatingProfit() + " -> " + formatNumber(after.getOperatingProfit());
+            String rtnStr = formatNumber(before.getOperatingProfit() + " -> " + formatNumber(after.getOperatingProfit()));
             if (expected.isPresent()) {
                 rtnStr += " -> " + formatNumber(expected.get().getOperatingProfit());
             }
