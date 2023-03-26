@@ -16,7 +16,7 @@ public enum IndicatorReportType {
             return afterRoe.compareTo(beforeRoe);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = formatNumber(before.getRoe()) + "-> " + formatNumber(after.getRoe());
+            String rtnStr = formatNumber(before.getRoe()) + " -> " + formatNumber(after.getRoe());
             if (expected.isPresent()) {
                 rtnStr += " -> " + formatNumber(expected.get().getRoe());
             }
@@ -61,7 +61,7 @@ public enum IndicatorReportType {
             return a.compareTo(b);
         },
         (Indicators after, Indicators before, Optional<Indicators> expected) -> {
-            String rtnStr = formatNumber(before.getOperatingProfit() + " -> " + formatNumber(after.getOperatingProfit()));
+            String rtnStr = formatNumber(before.getOperatingProfit()) + " -> " + formatNumber(after.getOperatingProfit());
             if (expected.isPresent()) {
                 rtnStr += " -> " + formatNumber(expected.get().getOperatingProfit());
             }
