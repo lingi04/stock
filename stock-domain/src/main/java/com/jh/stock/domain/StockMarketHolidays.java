@@ -1,7 +1,6 @@
 package com.jh.stock.domain;
 
-import org.springframework.cglib.core.Local;
-
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -9,8 +8,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
+
 public class StockMarketHolidays {
-    private static Set<String> HOLIDAY_KR;
+    private static final Set<String> HOLIDAY_KR;
+
     static {
         String[] stockMarketHolidays = {
             "2023-01-23", "2023-01-24", "2023-03-01", "2023-05-01", "2023-05-05", "2023-06-06", "2023-08-15",
@@ -26,8 +29,14 @@ public class StockMarketHolidays {
 
         HOLIDAY_KR = new HashSet<>(Arrays.asList(stockMarketHolidays));
     }
+
     public static boolean isHolidayToday() {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+        if (dayOfWeek == SUNDAY || dayOfWeek == SATURDAY) {
+            return true;
+        }
 
         String todayStr = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 

@@ -15,7 +15,7 @@ class StockMarketHolidaysTest {
 
     @Test
     void isHolidayToday_return_false_test() {
-        LocalDate expected = LocalDate.of(2023, 4, 1);
+        LocalDate expected = LocalDate.of(2023, 4, 3);
         try (MockedStatic<LocalDate> mocked = mockStatic(LocalDate.class)) {
             when(LocalDate.now(any(ZoneId.class))).thenReturn(expected);
             assertThat(StockMarketHolidays.isHolidayToday()).isFalse();
