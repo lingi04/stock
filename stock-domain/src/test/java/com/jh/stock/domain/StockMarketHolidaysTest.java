@@ -6,7 +6,7 @@ import org.mockito.MockedStatic;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
