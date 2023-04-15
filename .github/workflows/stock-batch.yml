@@ -24,7 +24,7 @@ jobs:
                 uses: actions/setup-java@v2
                 with:
                     java-version: '11'
-                    distribution: 'temurin'
+                    distribution: 'zulu'
             -   name: Build with Gradle
                 uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
                 with:
@@ -72,4 +72,4 @@ jobs:
                     -H 'Accept: application/vnd.github+json' \
                     -H "Authorization: Bearer ${{secrets.PERSONAL_ACCESS_KEY}}" \
                     -d '{"event_type": "stock-batch", "client_payload": { "repository":"stock", "project": "stock-batch", "runNumber":"${{github.run_number}}" }}'
-            
+
