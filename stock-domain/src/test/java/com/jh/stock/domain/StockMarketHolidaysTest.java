@@ -16,7 +16,12 @@ class StockMarketHolidaysTest {
     @Test
     void isHolidayToday_return_false_test() {
         LocalDate expected = LocalDate.of(2023, 4, 3);
-        try (MockedStatic<LocalDate> mocked = mockStatic(LocalDate.class)) {
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+
+        try (MockedStatic<LocalDate> mocked = mockStatic(LocalDate.class);
+             MockedStatic<ZoneId> mockedZoneId = mockStatic(ZoneId.class)
+        ) {
+            when(ZoneId.of("Asia/Seoul")).thenReturn(zoneId);
             when(LocalDate.now(any(ZoneId.class))).thenReturn(expected);
             assertThat(StockMarketHolidays.isHolidayToday()).isFalse();
         }
@@ -25,7 +30,12 @@ class StockMarketHolidaysTest {
     @Test
     void isHolidayToday_return_true_test() {
         LocalDate expected = LocalDate.of(2023, 12, 25);
-        try (MockedStatic<LocalDate> mocked = mockStatic(LocalDate.class)) {
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+
+        try (MockedStatic<LocalDate> mocked = mockStatic(LocalDate.class);
+             MockedStatic<ZoneId> mockedZoneId = mockStatic(ZoneId.class)
+        ) {
+            when(ZoneId.of("Asia/Seoul")).thenReturn(zoneId);
             when(LocalDate.now(any(ZoneId.class))).thenReturn(expected);
             assertThat(StockMarketHolidays.isHolidayToday()).isTrue();
         }
