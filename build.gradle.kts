@@ -26,6 +26,7 @@ subprojects {
             exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
         }
         testImplementation("io.github.javaunit:autoparams-lombok:0.0.3")
+        testImplementation("org.mockito:mockito-inline:3.7.7")
     }
 
     configurations {
