@@ -9,6 +9,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @StepScope
@@ -19,11 +20,9 @@ public class QuoteWriter implements ItemWriter<MyQuote> {
 
     @Override
     public void write(List<? extends MyQuote> quoteList) throws Exception {
-        quoteList.forEach(quote -> {
-            if (quote != null) {
-                myQuoteService.save(quote);
-                log.info("티커 : {}, 시장가 : {}, 등락폭 : {}, 거래량 : {}", quote.getTicker(), quote.getMarketPrice(), quote.getFluctuation(), quote.getTransactionVolume());
-            }
+        quoteList.stream().filter(Objects::nonNull).forEach(quote -> {
+            myQuoteService.save(quote);
+            log.info("티커 : {}, 시장가 : {}, 등락폭 : {}, 거래량 : {}", quote.getTicker(), quote.getMarketPrice(), quote.getFluctuation(), quote.getTransactionVolume());
         });
     }
 }
